@@ -14,12 +14,33 @@ namespace Phonebooklab11.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly INavigationService _navigation;
-        private readonly PhoneBookDbNasenkinaOeContext _context; // ← Добавь это поле
+        private readonly PhoneBookDbNasenkinaOeContext _context;
 
-
-
-        // Коллекция контактов
+        private readonly List<Contact> _allContacts;
         public ObservableCollection<Contact> Contacts { get; }
+
+        private Contact? _selectedContact;
+        public Contact? SelectedContact
+        {
+            get => _selectedContact;
+            set => Set(ref _selectedContact, value);
+        }
+
+        // 🔍 Новое свойство для поиска
+        private string _searchText = string.Empty;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (Set(ref _searchText, value))
+                {
+                    FilterContacts();
+                }
+            }
+        }
+
+        // Оставляем Name и Phone (если нужны для других целей)
         private string _name = string.Empty;
         public string Name
         {
@@ -34,15 +55,49 @@ namespace Phonebooklab11.ViewModels
             set => Set(ref _phone, value);
         }
 
-        private Contact? _selectedContact;
-        public Contact? SelectedContact
+        public ICommand AddCommand { get; }
+        public ICommand DeleteCommand { get; }
+        public ICommand EditContactCommand { get; }
+
+        public ContactsListViewModel(
+            IDialogService dialogService,
+            INavigationService navigation,
+            PhoneBookDbNasenkinaOeContext context)
         {
-            get => _selectedContact;
-            set => Set(ref _selectedContact, value);
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+
+            _allContacts = _context.Contacts.ToList();
+            Contacts = new ObservableCollection<Contact>(_allContacts);
+
+            AddCommand = new RelayCommand(AddContact);
+            DeleteCommand = new RelayCommand<Contact?>(DeleteContact, CanDeleteContact);
+            EditContactCommand = new RelayCommand(EditContact, CanEditContact);
         }
 
+        // 🔍 Фильтрация по имени или телефону
+        private void FilterContacts()
+        {
+            Contacts.Clear();
 
-        public ICommand EditContactCommand { get; }
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? _allContacts
+                : _allContacts.Where(c =>
+                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    c.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var contact in filtered)
+            {
+                Contacts.Add(contact);
+            }
+        }
+
+        private void AddContact()
+        {
+            _navigation.NavigateTo<ContactEditViewModel>(null);
+        }
+
         private void EditContact()
         {
             if (SelectedContact != null)
@@ -52,63 +107,6 @@ namespace Phonebooklab11.ViewModels
         }
         private bool CanEditContact() => SelectedContact != null;
 
-        // Команды
-        public ICommand AddCommand { get; }
-        public ICommand DeleteCommand { get; }
-        public ContactsListViewModel(
-                IDialogService dialogService,
-                INavigationService navigation,
-                PhoneBookDbNasenkinaOeContext context) // ← Добавь этот параметр!
-        {
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-
-            Contacts = new ObservableCollection<Contact>(_context.Contacts.ToList());
-
-            AddCommand = new RelayCommand(AddContact, CanAddContact);
-            DeleteCommand = new RelayCommand<Contact?>(DeleteContact, CanDeleteContact);
-            EditContactCommand = new RelayCommand(EditContact, CanEditContact);
-        }
-        private void AddContact()
-        {
-            // Проверка на дубликат
-            if (_context.Contacts.Any(c => c.Phone == Phone))
-            {
-                _dialogService.ShowWarning("Контакт с таким номером уже существует!");
-                return;
-            }
-
-            try
-            {
-                // Создаем контакт через объектную инициализацию (не через конструктор!)
-                var newContact = new Contact
-                {
-                    Name = Name,
-                    Phone = Phone
-                };
-
-                _context.Contacts.Add(newContact);
-                _context.SaveChanges(); // Сохраняем в БД!
-
-                // Обновляем ObservableCollection
-                Contacts.Add(newContact);
-
-                Name = string.Empty;
-                Phone = string.Empty;
-                _dialogService.ShowInfo("Контакт успешно добавлен!");
-            }
-            catch (Exception ex)
-            {
-                _dialogService.ShowError($"Ошибка при добавлении контакта: {ex.Message}");
-            }
-        }
-
-        private bool CanAddContact()
-        {
-            // Простая проверка на пустоту (вместо Contact.Validate)
-            return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Phone);
-        }
         private void DeleteContact(Contact? contact)
         {
             if (contact == null) return;
@@ -120,15 +118,13 @@ namespace Phonebooklab11.ViewModels
             if (result)
             {
                 _context.Contacts.Remove(contact);
-                _context.SaveChanges(); // Сохраняем изменения в БД!
+                _context.SaveChanges(); // DELETE
 
+                _allContacts.Remove(contact);
                 Contacts.Remove(contact);
                 SelectedContact = null;
             }
         }
-        private bool CanDeleteContact(Contact? contact)
-        {
-            return contact != null;
-        }
+        private bool CanDeleteContact(Contact? contact) => contact != null;
     }
 }
