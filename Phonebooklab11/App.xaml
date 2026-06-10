@@ -8,14 +8,11 @@
         <DataTemplate DataType="{x:Type vm:ContactsListViewModel}">
             <view:ContactsListView />
         </DataTemplate>
-        
         <DataTemplate DataType="{x:Type vm:ContactEditViewModel}">
             <view:ContactEditView />
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type vm:AboutViewModel}">
             <view:AboutView />
         </DataTemplate>
-         
     </Application.Resources>
 </Application>
