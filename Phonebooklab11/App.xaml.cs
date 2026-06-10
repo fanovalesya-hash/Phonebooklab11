@@ -15,7 +15,7 @@ namespace Phonebooklab11
 
             var services = new ServiceCollection();
 
-            services.AddSingleton<IDialogService, DialogService>(); // Из лабы 10
+            services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
             services.AddTransient<ContactsListViewModel>();
