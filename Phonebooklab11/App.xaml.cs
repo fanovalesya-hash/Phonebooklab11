@@ -17,17 +17,12 @@ namespace Phonebooklab11
 
             var services = new ServiceCollection();
 
-            // 1. Сервисы (Singleton)
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
-            // ✅ 2. РЕГИСТРАЦИЯ БАЗЫ ДАННЫХ (DbContext)
-            // Замени PhoneBookDB_NasenkinaOEContext на точное имя твоего класса контекста
-            // И вставь свою строку подключения из метода OnConfiguring
             services.AddDbContext<PhoneBookDbNasenkinaOeContext>(options =>
                 options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PhoneBookDB_NasenkinaOE;Integrated Security=True;TrustServerCertificate=True"));
 
-            // 3. Оболочка (Singleton)
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<MainWindow>(sp =>
             {
@@ -36,7 +31,6 @@ namespace Phonebooklab11
                 return window;
             });
 
-            // 4. Экраны (Transient)
             services.AddTransient<ContactsListViewModel>();
             services.AddTransient<ContactEditViewModel>();
             services.AddTransient<AboutViewModel>();

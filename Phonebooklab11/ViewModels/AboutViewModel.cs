@@ -8,6 +8,5 @@ namespace Phonebooklab11.ViewModels
     {
         public string AppName => "Телефонная книга MVVM";
         public string Version => "Версия 2.0 (Навигация + DI)";
-        public string Description => "Пример реализации Shell-архитектуры и ViewModel-First навигации в WPF.";
     }
 }

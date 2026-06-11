@@ -14,11 +14,9 @@ namespace Phonebooklab11.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly INavigationService _navigation;
-        private readonly PhoneBookDbNasenkinaOeContext _context; // ← Добавь это поле
+        private readonly PhoneBookDbNasenkinaOeContext _context;
 
 
-
-        // Коллекция контактов
         public ObservableCollection<Contact> Contacts { get; }
         private string _name = string.Empty;
         public string Name
@@ -52,13 +50,12 @@ namespace Phonebooklab11.ViewModels
         }
         private bool CanEditContact() => SelectedContact != null;
 
-        // Команды
         public ICommand AddCommand { get; }
         public ICommand DeleteCommand { get; }
         public ContactsListViewModel(
                 IDialogService dialogService,
                 INavigationService navigation,
-                PhoneBookDbNasenkinaOeContext context) // ← Добавь этот параметр!
+                PhoneBookDbNasenkinaOeContext context)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
@@ -72,7 +69,6 @@ namespace Phonebooklab11.ViewModels
         }
         private void AddContact()
         {
-            // Проверка на дубликат
             if (_context.Contacts.Any(c => c.Phone == Phone))
             {
                 _dialogService.ShowWarning("Контакт с таким номером уже существует!");
@@ -81,7 +77,6 @@ namespace Phonebooklab11.ViewModels
 
             try
             {
-                // Создаем контакт через объектную инициализацию (не через конструктор!)
                 var newContact = new Contact
                 {
                     Name = Name,
@@ -89,9 +84,8 @@ namespace Phonebooklab11.ViewModels
                 };
 
                 _context.Contacts.Add(newContact);
-                _context.SaveChanges(); // Сохраняем в БД!
+                _context.SaveChanges();
 
-                // Обновляем ObservableCollection
                 Contacts.Add(newContact);
 
                 Name = string.Empty;
@@ -106,7 +100,6 @@ namespace Phonebooklab11.ViewModels
 
         private bool CanAddContact()
         {
-            // Простая проверка на пустоту (вместо Contact.Validate)
             return !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Phone);
         }
         private void DeleteContact(Contact? contact)
@@ -120,8 +113,7 @@ namespace Phonebooklab11.ViewModels
             if (result)
             {
                 _context.Contacts.Remove(contact);
-                _context.SaveChanges(); // Сохраняем изменения в БД!
-
+                _context.SaveChanges();
                 Contacts.Remove(contact);
                 SelectedContact = null;
             }
