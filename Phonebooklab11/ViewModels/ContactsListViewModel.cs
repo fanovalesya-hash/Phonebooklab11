@@ -26,7 +26,6 @@ namespace Phonebooklab11.ViewModels
             set => Set(ref _selectedContact, value);
         }
 
-        // 🔍 Новое свойство для поиска
         private string _searchText = string.Empty;
         public string SearchText
         {
@@ -40,7 +39,6 @@ namespace Phonebooklab11.ViewModels
             }
         }
 
-        // Оставляем Name и Phone (если нужны для других целей)
         private string _name = string.Empty;
         public string Name
         {
@@ -76,7 +74,6 @@ namespace Phonebooklab11.ViewModels
             EditContactCommand = new RelayCommand(EditContact, CanEditContact);
         }
 
-        // 🔍 Фильтрация по имени или телефону
         private void FilterContacts()
         {
             Contacts.Clear();

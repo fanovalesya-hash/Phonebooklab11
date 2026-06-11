@@ -15,7 +15,6 @@ namespace Phonebooklab11.ViewModels
         private Contact? _contact;
         private bool _isNewContact;
 
-        // Свойства для создания нового контакта
         private string _name = string.Empty;
         public string Name
         {
@@ -30,7 +29,6 @@ namespace Phonebooklab11.ViewModels
             set => Set(ref _phone, value);
         }
 
-        // Свойства для редактирования существующего контакта
         public string EditName
         {
             get => _contact?.Name ?? string.Empty;
@@ -77,7 +75,6 @@ namespace Phonebooklab11.ViewModels
         {
             if (parameter is Contact contact)
             {
-                // Режим редактирования
                 _contact = contact;
                 _isNewContact = false;
                 OnPropertyChanged(nameof(EditName));
@@ -85,7 +82,6 @@ namespace Phonebooklab11.ViewModels
             }
             else
             {
-                // Режим создания нового контакта
                 _contact = null;
                 _isNewContact = true;
                 Name = string.Empty;
@@ -99,7 +95,6 @@ namespace Phonebooklab11.ViewModels
             {
                 if (_isNewContact)
                 {
-                    // CREATE: Создание нового контакта
                     if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Phone))
                     {
                         _dialogService.ShowWarning("Заполните все поля!");
@@ -119,16 +114,13 @@ namespace Phonebooklab11.ViewModels
                     };
 
                     _context.Contacts.Add(newContact);
-                    _context.SaveChanges(); // INSERT
+                    _context.SaveChanges();
 
                     _dialogService.ShowInfo("Контакт успешно создан!");
                 }
                 else
                 {
-                    // UPDATE: Редактирование существующего контакта
-                    // Change Tracker автоматически отслеживает изменения в _contact
-                    // Достаточно просто вызвать SaveChanges()
-                    _context.SaveChanges(); // UPDATE
+                    _context.SaveChanges();
 
                     _dialogService.ShowInfo("Изменения сохранены!");
                 }
