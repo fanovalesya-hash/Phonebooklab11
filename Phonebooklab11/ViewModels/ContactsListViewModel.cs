@@ -14,7 +14,6 @@ namespace Phonebooklab11.ViewModels
         private readonly INavigationService _navigation;
 
 
-        // Коллекция контактов
         public ObservableCollection<Contact> Contacts { get; }
         private string _name = string.Empty;
         public string Name
@@ -48,7 +47,6 @@ namespace Phonebooklab11.ViewModels
         }
         private bool CanEditContact() => SelectedContact != null;
 
-        // Команды
         public ICommand AddCommand { get; }
         public ICommand DeleteCommand { get; }
         public ContactsListViewModel(IDialogService dialogService, INavigationService navigation)
