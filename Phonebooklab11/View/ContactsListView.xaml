@@ -15,22 +15,17 @@
         <TextBox Grid.Row="0" Margin="0,5"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                  ToolTip="Введите имя контакта"/>
-        <!-- Имя. Привяжите Text к свойству Name -->
         <TextBox Grid.Row="1" Margin="0,5"
                  Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"
                  ToolTip="Введите номер телефона"/>
-        <!-- Номер. Привяжите Text к свойству Phone -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
             <Button Content="Добавить" Width="100" Margin="0,0,10,0"
                     Command="{Binding AddCommand}"/>
-            <!-- AddCommand -->
             <Button Content="Удалить" Width="100"
                     Command="{Binding DeleteCommand}"
                     CommandParameter="{Binding SelectedContact}"/>
-            <!-- Привяжите к DeleteCommand -->
             <Button Content="Редактировать" Width="100" Command="{Binding EditContactCommand}"/>
         </StackPanel>
-        <!-- Список контактов -->
         <DataGrid Grid.Row="3" AutoGenerateColumns="False" IsReadOnly="True"
             ItemsSource="{Binding Contacts}"
             SelectedItem="{Binding SelectedContact}">
